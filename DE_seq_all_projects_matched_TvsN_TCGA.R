@@ -34,8 +34,8 @@ proj <- projects[1]
 for (proj in projects) {
   
   df.exp <- data.table::fread(str_glue("~/CSBL_shared/RNASeq/TCGA/counts/{proj}.counts.csv")) %>%
-    as_tibble()
-  rownames(df.exp) <- df.exp$Ensembl
+    as_tibble() %>%
+    column_to_rownames(var = "Ensembl")
   
   coldata.t <- tumor.samples[tumor.samples$project == proj,]
   coldata.n <- normal.samples[normal.samples$project == proj,]
@@ -45,6 +45,8 @@ for (proj in projects) {
   
   df.exp <- df.exp[ ,colnames(df.exp) %in% coldata$barcode]
   
+  coldata$sample_type <- gsub(" ", "_", x = coldata$sample_type)
+  
   
   dds <- DESeqDataSetFromMatrix(countData = df.exp, colData = coldata, design = ~ sample_type)
   
@@ -52,14 +54,16 @@ for (proj in projects) {
   dds <- dds[keep,]
   
   
-  dds$sample_type <- relevel(dds$sample_type, ref = "Solid Tissue Normal")
+  dds$sample_type <- relevel(dds$sample_type, ref = "Solid_Tissue_Normal")
   
   
   dds <- DESeq(dds)
   res <- results(dds)
   resOrdered <- res[order(res$pvalue),]
+  resOrdered <- as.data.frame(resOrdered)
+  res <- as.data.frame(res)
   
-  write.csv("stuffs.txt")
+  write.csv(resOrdered, file = str_glue("~/storage/PanCancerAnalysis/TvsN_Matched_MS/{proj}_DE.csv"))
 }
 
 
