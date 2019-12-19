@@ -35,7 +35,7 @@ for (proj in projects) {
   
   df.exp <- data.table::fread(str_glue("~/CSBL_shared/RNASeq/TCGA/counts/{proj}.counts.csv")) %>%
     as_tibble() %>%
-    column_to_rownames(var = "Ensembl")
+    tibble::column_to_rownames(var = "Ensembl")
   
   coldata.t <- tumor.samples[tumor.samples$project == proj,]
   coldata.n <- normal.samples[normal.samples$project == proj,]
