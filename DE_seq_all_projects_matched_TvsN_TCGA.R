@@ -2,8 +2,8 @@
 # primary tumors that develop in the location the primary lesions metastesize towards
 
 # In this investigation we will coduct three analyses
-  # 1:Tumor vs Tumor, this will establish that there is a bonfide difference between the two primary lesions
-  # 2: Primary vs. Normal (Primary loc) VS Primary vs Normal (Met loc)
+# 1:Tumor vs Tumor, this will establish that there is a bonfide difference between the two primary lesions
+# 2: Primary vs. Normal (Primary loc) VS Primary vs Normal (Met loc)
 
 # tumor vs tumor DEseq2
 
@@ -27,6 +27,8 @@ clinical <- data.table::fread(
 normal.samples <- clinical[sample_type == "Solid Tissue Normal"]
 tumor.samples <- clinical[sample_type != "Solid Tissue Normal"]
 tumor.samples <- tumor.samples[tumor.samples$caseID %in% normal.samples$caseID,]
+
+clinical$barcode_short <- substr(clinical$barcode, 0,16)
 
 
 proj <- projects[1]
@@ -65,6 +67,17 @@ for (proj in projects) {
   
   write.csv(resOrdered, file = str_glue("~/storage/PanCancerAnalysis/TvsN_Matched_MS/{proj}_DE.csv"))
 }
+
+# Learning
+
+# cran doesn't work for this file. You must load it into your working directory which is some what of a pain in the ass
+
+library(RCurl)
+## paste URL to make it easier to read code (cosmetic!)
+dat_url <- paste0("https://github.com/cran/mlDNA/blob/master/data/mlDNA.rda")
+f <- getBinaryURL()
+L <- load(rawConnection(f))
+
 
 
 # R version 3.5.1 (2018-07-02)
